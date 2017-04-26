@@ -942,7 +942,48 @@
 
     }
   }
+
+  .image-status {
+
+    .node-details-content-section-header {
+      display: flex;
+      justify-content: space-between;
+      line-height: 26px;
+    }
+
+    .images .wrapper{
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .weave-circular-progress-wrapper {
+      position: absolute;
+      left: 50%;
+    }
+
+    .new-image {
+      color: $success-green;
+    }
+
+    a {
+      &:hover {
+        background-color: #f1f1f6;
+        cursor: pointer;
+      }
+    }
+
+    .node-details-table-node-link,
+    .node-details-table-node-label {
+      flex: 1;
+      font-size: 14px;
+      color: $text-color;
+      line-height: 24px;
+      text-transform: none;
+    }
+  }
 }
+
+
 
 .node-resources {
   &-metric-box {

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-webpack-loader-syntax, import/no-unresolved */
 import debug from 'debug';
-import { size, each, includes, isEqual } from 'lodash';
+import { size, each, includes, isEqual, find } from 'lodash';
 import { fromJS, is as isDeepEqual, List as makeList, Map as makeMap,
   OrderedMap as makeOrderedMap, Set as makeSet } from 'immutable';
 
@@ -84,6 +84,7 @@ export const initialState = makeMap({
   viewport: makeMap(),
   websocketClosed: false,
   zoomCache: makeMap(),
+  serviceImages: makeMap({ fetching: false })
 });
 
 function calcSelectType(topology) {
@@ -739,6 +740,23 @@ export function rootReducer(state = initialState, action) {
     case ActionTypes.SHUTDOWN: {
       state = clearNodes(state);
       return state.set('nodesLoaded', false);
+    }
+
+    case ActionTypes.REQUEST_SERVICE_IMAGES: {
+      return state.setIn(['serviceImages', 'fetching'], true);
+    }
+
+    case ActionTypes.RECEIVE_SERVICE_IMAGES: {
+      state = state.setIn(['serviceImages', 'fetching'], false);
+
+      if (action.errors) {
+        return state.setIn(['serviceImages', 'errors'], action.errors);
+      }
+
+      const service = find(action.services, s => s.ID === action.serviceId);
+      state = state.setIn(['serviceImages', action.serviceId], service ? service.Containers : null);
+      state = state.setIn(['serviceImages', 'errors'], null);
+      return state;
     }
 
     default: {

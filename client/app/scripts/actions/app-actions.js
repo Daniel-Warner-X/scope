@@ -795,3 +795,24 @@ export function shutdown() {
     type: ActionTypes.SHUTDOWN
   };
 }
+
+export function getImagesForService(orgId, serviceId) {
+  return (dispatch, getState, { api }) => {
+    dispatch({
+      type: ActionTypes.REQUEST_SERVICE_IMAGES
+    });
+    api.getFluxImages(orgId, serviceId)
+      .then((services) => {
+        dispatch({
+          type: ActionTypes.RECEIVE_SERVICE_IMAGES,
+          serviceId,
+          services
+        });
+      }, ({ errors }) => {
+        dispatch({
+          type: ActionTypes.RECEIVE_SERVICE_IMAGES,
+          errors
+        });
+      });
+  };
+}
