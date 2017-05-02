@@ -682,7 +682,7 @@ describe('RootReducer', () => {
     const action = {
       type: ActionTypes.RECEIVE_SERVICE_IMAGES,
       serviceId: 'cortex/configs',
-      services: [{
+      service: {
         ID: 'cortex/configs',
         Containers: [{
           Available: [{
@@ -692,19 +692,23 @@ describe('RootReducer', () => {
           Current: { ID: 'quay.io/weaveworks/cortex-configs:master-1ca6274a' },
           Name: 'configs'
         }]
-      }]
+      }
     };
 
     const nextState = reducer(initialState, action);
-    expect(nextState.getIn(['serviceImages', 'cortex/configs'])).toEqual([{
-      Name: 'configs',
-      Current: {
-        ID: 'quay.io/weaveworks/cortex-configs:master-1ca6274a'
-      },
-      Available: [{
-        ID: 'quay.io/weaveworks/cortex-configs:master-1ca6274a',
-        CreatedAt: '2017-04-26T13:50:13.284736173Z'
+    expect(nextState.getIn(['serviceImages', 'cortex/configs'])).toEqual({
+      isFetching: false,
+      errors: undefined,
+      containers: [{
+        Name: 'configs',
+        Current: {
+          ID: 'quay.io/weaveworks/cortex-configs:master-1ca6274a'
+        },
+        Available: [{
+          ID: 'quay.io/weaveworks/cortex-configs:master-1ca6274a',
+          CreatedAt: '2017-04-26T13:50:13.284736173Z'
+        }]
       }]
-    }]);
+    });
   });
 });
