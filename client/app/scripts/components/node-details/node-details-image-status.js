@@ -24,8 +24,8 @@ class NodeDetailsImageStatus extends React.PureComponent {
   }
 
   componentDidMount() {
-    if (this.props.serviceName) {
-      this.props.getImagesForService(this.props.params.orgId, this.props.serviceName);
+    if (this.props.serviceId) {
+      this.props.getImagesForService(this.props.params.orgId, this.props.serviceId);
     }
   }
 
@@ -33,9 +33,46 @@ class NodeDetailsImageStatus extends React.PureComponent {
     this.props.router.push(`/flux/${this.props.params.orgId}/services/${encodeURIComponent(this.props.serviceName)}`);
   }
 
+  renderImages() {
+    const { errors, containers, isFetching } = this.props;
+    const error = !isFetching && errors;
+
+    if (isFetching) {
+      return (
+        <div className="progress-wrapper"><CircularProgress /></div>
+      );
+    }
+
+    if (error) {
+      return (
+        <p>Error: {JSON.stringify(map(errors, 'message'))}</p>
+      );
+    }
+
+    if (!containers) {
+      return 'No service images found';
+    }
+
+    return (
+      <div className="images">
+        {containers.map((container) => {
+          const statusText = getNewImages(container.Available, container.Current.ID).length > 0
+            ? <span className="new-image">New image(s) available</span>
+            : 'Image up to date';
+
+          return (
+            <div key={container.Name} className="wrapper">
+              <div className="node-details-table-node-label">{container.Name}</div>
+              <div className="node-details-table-node-label">{statusText}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   render() {
-    const { errors, service, currentTopologyId } = this.props;
-    const fetching = true;
+    const { containers, currentTopologyId } = this.props;
 
     if (currentTopologyId && !topologyWhitelist.includes(currentTopologyId)) {
       return null;
@@ -45,7 +82,7 @@ class NodeDetailsImageStatus extends React.PureComponent {
       <div className="node-details-content-section image-status">
         <div className="node-details-content-section-header">
           Container Image Status
-          {service &&
+          {containers &&
             <div>
               <a
                 onClick={this.handleServiceClick}
@@ -56,25 +93,7 @@ class NodeDetailsImageStatus extends React.PureComponent {
           }
 
         </div>
-        {fetching && <div className="progress-wrapper"><CircularProgress /></div>}
-        {!fetching && errors && <p>Error: {JSON.stringify(map(errors, 'message'))}</p>}
-        {!errors && !fetching && !service && 'No service images found'}
-        {!errors && !fetching && service &&
-          <div className="images">
-            {service.map((container) => {
-              const statusText = getNewImages(container.Available, container.Current.ID).length > 0
-                ? <span className="new-image">New image(s) available</span>
-                : 'Image up to date';
-
-              return (
-                <div key={container.Name} className="wrapper">
-                  <div className="node-details-table-node-label">{container.Name}</div>
-                  <div className="node-details-table-node-label">{statusText}</div>
-                </div>
-              );
-            })}
-          </div>
-        }
+        {this.renderImages()}
       </div>
     );
   }
@@ -82,13 +101,15 @@ class NodeDetailsImageStatus extends React.PureComponent {
 
 function mapStateToProps({ scope }, { metadata, name }) {
   const namespace = find(metadata, d => d.id === 'kubernetes_namespace');
-  const serviceName = namespace ? `${namespace.value}/${name}` : null;
+  const serviceId = namespace ? `${namespace.value}/${name}` : null;
+  const { containers, isFetching, errors } = scope.getIn(['serviceImages', serviceId]) || {};
+
   return {
-    fetching: scope.getIn(['serviceImages', 'fetching']),
-    errors: scope.getIn(['serviceImages', 'errors']),
+    isFetching,
+    errors,
     currentTopologyId: scope.get('currentTopologyId'),
-    service: scope.getIn(['serviceImages', serviceName]),
-    serviceName
+    containers,
+    serviceId
   };
 }
 

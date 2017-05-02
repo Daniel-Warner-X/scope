@@ -1,4 +1,5 @@
 import debug from 'debug';
+import find from 'lodash/find';
 
 import ActionTypes from '../constants/action-types';
 import { saveGraph } from '../utils/file-utils';
@@ -799,14 +800,14 @@ export function shutdown() {
 export function getImagesForService(orgId, serviceId) {
   return (dispatch, getState, { api }) => {
     dispatch({
-      type: ActionTypes.REQUEST_SERVICE_IMAGES
+      type: ActionTypes.REQUEST_SERVICE_IMAGES,
+      serviceId
     });
     api.getFluxImages(orgId, serviceId)
       .then((services) => {
         dispatch({
           type: ActionTypes.RECEIVE_SERVICE_IMAGES,
-          serviceId,
-          services
+          service: find(services, s => s.ID === serviceId)
         });
       }, ({ errors }) => {
         dispatch({
