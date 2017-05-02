@@ -803,11 +803,13 @@ export function getImagesForService(orgId, serviceId) {
       type: ActionTypes.REQUEST_SERVICE_IMAGES,
       serviceId
     });
+
     api.getFluxImages(orgId, serviceId)
       .then((services) => {
         dispatch({
           type: ActionTypes.RECEIVE_SERVICE_IMAGES,
-          service: find(services, s => s.ID === serviceId)
+          service: find(services, s => s.ID === serviceId),
+          serviceId
         });
       }, ({ errors }) => {
         dispatch({

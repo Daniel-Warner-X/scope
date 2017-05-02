@@ -6,7 +6,7 @@ import { CircularProgress } from 'weaveworks-ui-components';
 
 import { getImagesForService } from '../../actions/app-actions';
 
-const topologyWhitelist = ['services'];
+const topologyWhitelist = ['services', 'deployments'];
 
 function getNewImages(images, currentId) {
   // Assume that the current image is always in the list of all available images.
@@ -24,7 +24,7 @@ class NodeDetailsImageStatus extends React.PureComponent {
   }
 
   componentDidMount() {
-    if (this.props.serviceId) {
+    if (this.shouldRender() && this.props.serviceId) {
       this.props.getImagesForService(this.props.params.orgId, this.props.serviceId);
     }
   }
@@ -32,6 +32,11 @@ class NodeDetailsImageStatus extends React.PureComponent {
   handleServiceClick() {
     const { router, serviceId, params } = this.props;
     router.push(`/flux/${params.orgId}/services/${encodeURIComponent(serviceId)}`);
+  }
+
+  shouldRender() {
+    const { currentTopologyId } = this.props;
+    return currentTopologyId && topologyWhitelist.includes(currentTopologyId);
   }
 
   renderImages() {
@@ -73,9 +78,9 @@ class NodeDetailsImageStatus extends React.PureComponent {
   }
 
   render() {
-    const { containers, currentTopologyId } = this.props;
+    const { containers } = this.props;
 
-    if (currentTopologyId && !topologyWhitelist.includes(currentTopologyId)) {
+    if (!this.shouldRender()) {
       return null;
     }
 

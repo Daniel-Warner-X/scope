@@ -749,11 +749,11 @@ export function rootReducer(state = initialState, action) {
     }
 
     case ActionTypes.RECEIVE_SERVICE_IMAGES: {
-      const { service, errors } = action;
+      const { service, errors, serviceId } = action;
 
-      return state.setIn(['serviceImages', service.ID], {
+      return state.setIn(['serviceImages', serviceId], {
         isFetching: false,
-        containers: service.Containers,
+        containers: service ? service.Containers : null,
         errors
       });
     }
