@@ -30,7 +30,8 @@ class NodeDetailsImageStatus extends React.PureComponent {
   }
 
   handleServiceClick() {
-    this.props.router.push(`/flux/${this.props.params.orgId}/services/${encodeURIComponent(this.props.serviceName)}`);
+    const { router, serviceId, params } = this.props;
+    router.push(`/flux/${params.orgId}/services/${encodeURIComponent(serviceId)}`);
   }
 
   renderImages() {
