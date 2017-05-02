@@ -945,6 +945,10 @@
 
   .image-status {
 
+    .progress-wrapper {
+      position: relative;
+    }
+
     .node-details-content-section-header {
       display: flex;
       justify-content: space-between;

@@ -34,7 +34,8 @@ class NodeDetailsImageStatus extends React.PureComponent {
   }
 
   render() {
-    const { errors, service, fetching, currentTopologyId } = this.props;
+    const { errors, service, currentTopologyId } = this.props;
+    const fetching = true;
 
     if (currentTopologyId && !topologyWhitelist.includes(currentTopologyId)) {
       return null;
@@ -55,7 +56,7 @@ class NodeDetailsImageStatus extends React.PureComponent {
           }
 
         </div>
-        {fetching && <CircularProgress />}
+        {fetching && <div className="progress-wrapper"><CircularProgress /></div>}
         {!fetching && errors && <p>Error: {JSON.stringify(map(errors, 'message'))}</p>}
         {!errors && !fetching && !service && 'No service images found'}
         {!errors && !fetching && service &&
